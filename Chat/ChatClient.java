@@ -35,6 +35,9 @@ public class ChatClient {
                if(message.equals("/exit")){
                    fin = true;
                }
+               else if(message.equals("/history")){
+                   chat.requestHistory(a_stub);
+               }
                else{
                    chat.sendMessage(a_stub,message);
                }
