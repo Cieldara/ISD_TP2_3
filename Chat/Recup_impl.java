@@ -1,4 +1,5 @@
 import java.rmi.*;
+import javafx.application.Platform;
 import javafx.scene.control.ListView;
 
 
@@ -11,8 +12,11 @@ public class Recup_impl implements Recup_itf{
 
     public void recupMessage(String message)  throws RemoteException{
         System.out.println(message);
-	l.add(message);
-
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                list.getItems().add(message);            }
+        });
     }
 
 }

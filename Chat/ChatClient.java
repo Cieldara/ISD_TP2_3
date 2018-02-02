@@ -48,7 +48,18 @@ public class ChatClient extends Application{
            send.setOnAction(new EventHandler<ActionEvent>() {
                 @Override public void handle(ActionEvent e) {
                     try{
-                        chat.sendMessage(a_stub,messageField.getText());
+                        String message = messageField.getText();
+                        if(message.equals("/exit")) {
+                            chat.leave(client);
+                            registry.unbind("RecupService"+getParameters().getRaw().get(1));
+                            System.exit(0);
+                        }
+                        else if(message.equals("/history")) {
+                           chat.requestHistory(a_stub); 
+                        }
+                        else{
+                            chat.sendMessage(a_stub,messageField.getText());
+                        }
                     }
                     catch(Exception ex){
 
@@ -63,9 +74,6 @@ public class ChatClient extends Application{
 
             chat.join(client);
 
-           Scanner scanner = new Scanner(System.in);
-           String res;
-           boolean fin = false;
            /*
            while(!fin){
 
