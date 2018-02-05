@@ -2,6 +2,8 @@
 import java.rmi.*;
 import java.util.*;
 import java.rmi.registry.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Chat implements Chat_itf {
 
@@ -15,10 +17,10 @@ public class Chat implements Chat_itf {
         this.reg = reg;
     }
 
-    public boolean isNotUsed(Accounting_itf client) throws RemoteException {
+    public boolean isNotUsed(String client) throws RemoteException {
         boolean ok = true;
         for (int i = 0; i < client_list.size() && ok; i++) {
-            if (client.getName().equals(client_list.get(i).getName())) {
+            if (client.equals(client_list.get(i).getName())) {
                 ok = false;
             }
         }
@@ -27,7 +29,7 @@ public class Chat implements Chat_itf {
 
     public boolean join(Accounting_itf client) throws RemoteException {
 
-        if (!isNotUsed(client)) {
+        if (!isNotUsed(client.getName())) {
             return false;
         }
         System.out.println(client.getName() + " joined !");
@@ -35,7 +37,7 @@ public class Chat implements Chat_itf {
         try {
             for (int i = 0; i < client_list.size(); i++) {
                 Recup_itf chat = (Recup_itf) reg.lookup("RecupService" + client_list.get(i).getName());
-                chat.recupMessage(client.getName() + " joined !");
+                chat.recupMessage(client.getName() + " joined !", "green");
             }
         } catch (Exception e) {
 
@@ -49,7 +51,7 @@ public class Chat implements Chat_itf {
         try {
             for (int i = 0; i < client_list.size(); i++) {
                 Recup_itf chat = (Recup_itf) reg.lookup("RecupService" + client_list.get(i).getName());
-                chat.recupMessage(client.getName() + " left !");
+                chat.recupMessage(client.getName() + " left !", "green");
             }
         } catch (Exception e) {
 
@@ -61,7 +63,7 @@ public class Chat implements Chat_itf {
         try {
             for (int i = 0; i < client_list.size(); i++) {
                 Recup_itf chat = (Recup_itf) reg.lookup("RecupService" + client_list.get(i).getName());
-                chat.recupMessage(mess);
+                chat.recupMessage(mess, "black");
             }
         } catch (Exception e) {
 
@@ -74,10 +76,44 @@ public class Chat implements Chat_itf {
         try {
             Recup_itf chat = (Recup_itf) reg.lookup("RecupService" + client.getName());
             for (int i = 0; i < history.size(); i++) {
-                chat.recupMessage(history.get(i));
+                chat.recupMessage(history.get(i), "purple");
             }
         } catch (Exception e) {
 
+        }
+    }
+
+    @Override
+    public void whisper(Accounting_itf sender, String receiver, String message) throws RemoteException, AccessException {
+        try {
+            Recup_itf senderChat = (Recup_itf) reg.lookup("RecupService" + sender.getName());
+            if (!isNotUsed(receiver)) {
+                Recup_itf receiverChat = (Recup_itf) reg.lookup("RecupService" + receiver);
+                receiverChat.recupMessage(sender.getName() + " says to you : " + message, "blue");
+                senderChat.recupMessage("You say to " + receiver + " : " + message, "blue");
+            } else {
+                senderChat.recupMessage(receiver + " is not known !", "red");
+            }
+
+        } catch (NotBoundException ex) {
+            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Override
+    public void wizz(Accounting_itf sender, String receiver) throws RemoteException, AccessException {
+        try {
+                 
+            if (!isNotUsed(receiver)) {
+                Wizz_itf wizzService = (Wizz_itf) reg.lookup("WizzService"+receiver);
+                wizzService.wizz();
+            } else {
+                System.out.println("Error ! ");
+                Recup_itf senderChat = (Recup_itf) reg.lookup("RecupService" + sender.getName());
+                senderChat.recupMessage(receiver + " is not known !", "red");
+            }
+        } catch (NotBoundException ex) {
+            Logger.getLogger(Chat.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
