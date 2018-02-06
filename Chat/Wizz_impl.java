@@ -24,7 +24,7 @@ import javafx.util.Duration;
             tt = new TranslateTransition(Duration.millis(50), node);
             tt.setFromX(0f);
             tt.setByX(10f);
-            tt.setCycleCount(10);
+            tt.setCycleCount(20);
             tt.setAutoReverse(true);
         }
 

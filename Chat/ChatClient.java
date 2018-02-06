@@ -16,13 +16,45 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Button;
 import javafx.event.*;
 import javafx.scene.Node;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.util.Duration;
 
 public class ChatClient extends Application {
 
     String username;
-    
-    
+
+    public static void sendMessage(TextField messageField, Chat_itf chat, Accounting_itf client, Registry registry, Accounting_itf a_stub) {
+        try {
+            String message = messageField.getText();
+            String decomposition[] = message.split(" ");
+            if (message.equals("/exit")) {
+                chat.leave(client);
+                registry.unbind("RecupService" + client.getName());
+                registry.unbind("WizzService" + client.getName());
+                System.exit(0);
+            } else if (message.equals("/history")) {
+                chat.requestHistory(a_stub);
+            } else if (decomposition[0].equals("/whisper")) {
+                if (decomposition.length >= 3) {
+                    String realMessage = "";
+                    for (int i = 2; i < decomposition.length; i++) {
+                        realMessage += decomposition[i] + " ";
+                    }
+                    chat.whisper(client, decomposition[1], realMessage);
+                }
+            } else if (decomposition[0].equals("/wizz")) {
+                if (decomposition.length == 2) {
+                    chat.wizz(client, decomposition[1]);
+                }
+            } else {
+                chat.sendMessage(a_stub, messageField.getText());
+            }
+        } catch (Exception ex) {
+
+        }
+        messageField.clear();
+    }
 
     public void start(Stage stage) {
         try {
@@ -55,40 +87,19 @@ public class ChatClient extends Application {
             send.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent e) {
-                    try {
-                        String message = messageField.getText();
-                        String decomposition[] = message.split(" ");
-                        if (message.equals("/exit")) {
-                            chat.leave(client);
-                            registry.unbind("RecupService" + client.getName());
-                            System.exit(0);
-                        } else if (message.equals("/history")) {
-                            chat.requestHistory(a_stub);
-                        } 
-                        else if(decomposition[0].equals("/whisper")){
-                            if(decomposition.length >= 3){
-                                String realMessage = "";
-                                for(int i = 2; i < decomposition.length;i++){
-                                    realMessage+=decomposition[i] + " ";
-                                }
-                                chat.whisper(client, decomposition[1], realMessage);
-                            }
-                        }
-                        else if(decomposition[0].equals("/wizz")){
-                            if(decomposition.length == 2){
-                                chat.wizz(client,decomposition[1]);                              
-                            }
-                        }
-                        else {
-                            chat.sendMessage(a_stub, messageField.getText());
-                        }
-                    } catch (Exception ex) {
-
-                    }
-                    messageField.clear();
+                    sendMessage(messageField, chat, client, registry, a_stub);
                 }
             });
-            
+
+            messageField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+                @Override
+                public void handle(KeyEvent ke) {
+                    if (ke.getCode().equals(KeyCode.ENTER)) {
+                        sendMessage(messageField, chat, client, registry, a_stub);
+                    }
+                }
+            });
+
             /* Interface de connection */
             BorderPane rootConnection = new BorderPane();
             TextField userNameField = new TextField();
@@ -108,9 +119,9 @@ public class ChatClient extends Application {
                             Recup_itf chat_stub = (Recup_itf) UnicastRemoteObject.exportObject(r, 0);
                             registry.bind("RecupService" + client.getName(), chat_stub);
                             Wizz_impl w = new Wizz_impl(root);
-                            Wizz_itf wizz_stub = (Wizz_itf)UnicastRemoteObject.exportObject(w, 0);
+                            Wizz_itf wizz_stub = (Wizz_itf) UnicastRemoteObject.exportObject(w, 0);
                             registry.bind("WizzService" + client.getName(), wizz_stub);
-                            
+
                             scene.setRoot(root);
                         }
                     } catch (RemoteException | AlreadyBoundException ex) {
@@ -126,24 +137,24 @@ public class ChatClient extends Application {
             stage.show();
 
             /*
-           while(!fin){
+             while(!fin){
 
-               String message = scanner.nextLine();
-               if(message.equals("/exit")){
-                   fin = true;
-               }
-               else if(message.equals("/history")){
-                   chat.requestHistory(a_stub);
-               }
-               else{
-                   chat.sendMessage(a_stub,message);
-               }
+             String message = scanner.nextLine();
+             if(message.equals("/exit")){
+             fin = true;
+             }
+             else if(message.equals("/history")){
+             chat.requestHistory(a_stub);
+             }
+             else{
+             chat.sendMessage(a_stub,message);
+             }
 
-           }
+             }
 
-           chat.leave(client);
-           registry.unbind("RecupService"+getParameters().getRaw().get(1));
-           System.exit(0);*/
+             chat.leave(client);
+             registry.unbind("RecupService"+getParameters().getRaw().get(1));
+             System.exit(0);*/
         } catch (Exception e) {
             System.err.println("Error on client: " + e);
         }
