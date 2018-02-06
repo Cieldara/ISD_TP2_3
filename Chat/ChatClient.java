@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.animation.TranslateTransition;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.control.ListView;
@@ -32,6 +33,7 @@ public class ChatClient extends Application {
                 chat.leave(client);
                 registry.unbind("RecupService" + client.getName());
                 registry.unbind("WizzService" + client.getName());
+                Platform.exit();
                 System.exit(0);
             } else if (message.equals("/history")) {
                 chat.requestHistory(a_stub);
