@@ -1,11 +1,9 @@
 
-import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.*;
 import java.rmi.registry.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.animation.TranslateTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
@@ -16,10 +14,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Button;
 import javafx.event.*;
-import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.util.Duration;
 
 public class ChatClient extends Application {
 
@@ -31,8 +27,6 @@ public class ChatClient extends Application {
             String decomposition[] = message.split(" ");
             if (message.equals("/exit")) {
                 chat.leave(client);
-                registry.unbind("RecupService" + client.getName());
-                registry.unbind("WizzService" + client.getName());
                 Platform.exit();
                 System.exit(0);
             } else if (message.equals("/history")) {
@@ -67,16 +61,16 @@ public class ChatClient extends Application {
 
             String host = getParameters().getRaw().get(0);
             username = "Anonymous";
+            ListView displayArea = new ListView();
+            /* Interface du tchat */
+            BorderPane root = new BorderPane();
 
-            Client client = new Client(username);
+            Client client = new Client(username, displayArea, root);
             Accounting_itf a_stub = (Accounting_itf) UnicastRemoteObject.exportObject(client, 0);
 
             Registry registry = LocateRegistry.getRegistry(host);
             Chat_itf chat = (Chat_itf) registry.lookup("ChatService");
 
-            /* Interface du tchat */
-            BorderPane root = new BorderPane();
-            ListView displayArea = new ListView();
             ScrollPane displayContainer = new ScrollPane(displayArea);
             BorderPane inputPane = new BorderPane();
             TextField messageField = new TextField();
@@ -117,16 +111,9 @@ public class ChatClient extends Application {
                     try {
                         client.setName(username);
                         if (chat.join(client)) {
-                            Recup_impl r = new Recup_impl(displayArea);
-                            Recup_itf chat_stub = (Recup_itf) UnicastRemoteObject.exportObject(r, 0);
-                            registry.bind("RecupService" + client.getName(), chat_stub);
-                            Wizz_impl w = new Wizz_impl(root);
-                            Wizz_itf wizz_stub = (Wizz_itf) UnicastRemoteObject.exportObject(w, 0);
-                            registry.bind("WizzService" + client.getName(), wizz_stub);
-
                             scene.setRoot(root);
                         }
-                    } catch (RemoteException | AlreadyBoundException ex) {
+                    } catch (RemoteException ex) {
                         ex.printStackTrace();
                         Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
                     }
