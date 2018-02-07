@@ -6,7 +6,7 @@ import javafx.util.Duration;
 //Maybe a wizz service ? :)
 class Shaker {
 
-    private TranslateTransition tt;
+    private final TranslateTransition tt;
 
     public Shaker(Node node) {
         tt = new TranslateTransition(Duration.millis(50), node);

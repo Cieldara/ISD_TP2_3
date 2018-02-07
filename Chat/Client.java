@@ -10,13 +10,15 @@ import javafx.scene.text.Text;
 public class Client implements Accounting_itf {
 
     private String name;
-    private ListView list;
-    private Pane pane;
+    private final ListView list;
+    private final Pane pane;
+    private final ListView onlinePeople;
 
-    public Client(String name, ListView l, Pane p) {
+    public Client(String name, ListView l, Pane p, ListView online) {
         this.name = name;
         this.list = l;
         this.pane = p;
+        this.onlinePeople = online;
     }
 
     public void setName(String name) throws RemoteException {
@@ -53,7 +55,6 @@ public class Client implements Accounting_itf {
     }
 
     public void recupMessage(String message, String color) throws RemoteException {
-        System.out.println(message);
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -78,6 +79,7 @@ public class Client implements Accounting_itf {
                 }
                 text.setFill(col);
                 list.getItems().add(text);
+                list.scrollTo(list.getItems().size() - 1);
             }
         });
 
@@ -87,5 +89,27 @@ public class Client implements Accounting_itf {
     public void wizz() throws RemoteException {
         Shaker shaker = new Shaker(pane);
         shaker.shake();
+    }
+
+    @Override
+    public void addSomeone(String name) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                onlinePeople.getItems().add(name);
+
+            }
+        });
+    }
+
+    @Override
+    public void removeSomeone(String name) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                onlinePeople.getItems().remove(name);
+            }
+        });
+
     }
 }

@@ -8,5 +8,9 @@ public interface Accounting_itf extends Remote {
     public void recupMessage(String message, String color) throws RemoteException;
 
     public void wizz() throws RemoteException;
+    
+    public void addSomeone(String name) throws RemoteException;
+    
+    public void removeSomeone(String name) throws RemoteException;
 
 }

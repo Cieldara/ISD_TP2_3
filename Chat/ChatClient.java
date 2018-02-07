@@ -9,13 +9,13 @@ import javafx.application.Platform;
 import javafx.stage.Stage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Button;
 import javafx.event.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.text.Text;
 
 public class ChatClient extends Application {
 
@@ -65,19 +65,32 @@ public class ChatClient extends Application {
             /* Interface du tchat */
             BorderPane root = new BorderPane();
 
-            Client client = new Client(username, displayArea, root);
+            ListView online = new ListView();
+            online.prefWidthProperty().bind(root.widthProperty().multiply(0.25));
+
+            Client client = new Client(username, displayArea, root, online);
             Accounting_itf a_stub = (Accounting_itf) UnicastRemoteObject.exportObject(client, 0);
 
             Registry registry = LocateRegistry.getRegistry(host);
             Chat_itf chat = (Chat_itf) registry.lookup("ChatService");
 
-            ScrollPane displayContainer = new ScrollPane(displayArea);
             BorderPane inputPane = new BorderPane();
             TextField messageField = new TextField();
             Button send = new Button("Send");
             inputPane.setCenter(messageField);
             inputPane.setRight(send);
-            root.setCenter(displayContainer);
+            BorderPane infoPane = new BorderPane();
+            Text name = new Text();
+            Text serverName = new Text("We-llBehaved Chat");
+            infoPane.setRight(serverName);
+            infoPane.setLeft(name);
+            //Image image = new Image("baby.png");
+            //infoPane.setBackground(new Background(new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
+            //image.setPreserveRatio(true);
+            //infoPane.setCenter(image);
+            root.setTop(infoPane);
+            root.setCenter(displayArea);
+            root.setLeft(online);
             root.setBottom(inputPane);
 
             send.setOnAction(new EventHandler<ActionEvent>() {
@@ -100,8 +113,9 @@ public class ChatClient extends Application {
             BorderPane rootConnection = new BorderPane();
             TextField userNameField = new TextField();
             Button connectionButton = new Button("Connection");
-            rootConnection.setTop(userNameField);
+            rootConnection.setCenter(userNameField);
             rootConnection.setBottom(connectionButton);
+            rootConnection.setTop(new Text("We-llBehaved Chat"));
             stage.setTitle("We-llBehaved Chat");
             Scene scene = new Scene(rootConnection);
             connectionButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -111,6 +125,7 @@ public class ChatClient extends Application {
                     try {
                         client.setName(username);
                         if (chat.join(client)) {
+                            name.setText("Logged as " + username);
                             scene.setRoot(root);
                         }
                     } catch (RemoteException ex) {

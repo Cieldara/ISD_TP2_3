@@ -1,20 +1,15 @@
 
 import java.rmi.*;
 import java.util.*;
-import java.rmi.registry.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class Chat implements Chat_itf {
 
-    private ArrayList<Accounting_itf> client_list;
-    private ArrayList<String> history;
-    private Registry reg;
+    private final ArrayList<Accounting_itf> client_list;
+    private final ArrayList<String> history;
 
-    public Chat(Registry reg) {
+    public Chat() {
         this.client_list = new ArrayList<>();
         this.history = new ArrayList<>();
-        this.reg = reg;
     }
 
     public boolean isNotUsed(String client) throws RemoteException {
@@ -42,13 +37,15 @@ public class Chat implements Chat_itf {
         if (!isNotUsed(client.getName())) {
             return false;
         }
-        System.out.println(client.getName() + " joined !");
         client_list.add(client);
         try {
             for (int i = 0; i < client_list.size(); i++) {
                 //Recup_itf chat = (Recup_itf) reg.lookup("RecupService" + client_list.get(i).getName());
-                client.recupMessage(client.getName() + " joined !", "green");
+                client_list.get(i).recupMessage(client.getName() + " joined !", "green");
+                client_list.get(i).addSomeone(client.getName());
+                client.addSomeone(client_list.get(i).getName());
             }
+            client.removeSomeone(client.getName());
         } catch (Exception e) {
 
         }
@@ -56,12 +53,12 @@ public class Chat implements Chat_itf {
     }
 
     public void leave(Accounting_itf client) throws RemoteException {
-        System.out.println(client.getName() + " left !");
         client_list.remove(client);
         try {
             for (int i = 0; i < client_list.size(); i++) {
                 //Recup_itf chat = (Recup_itf) reg.lookup("RecupService" + client_list.get(i).getName());
-                client.recupMessage(client.getName() + " left !", "green");
+                client_list.get(i).recupMessage(client.getName() + " left !", "green");
+                client_list.get(i).removeSomeone(client.getName());
             }
         } catch (Exception e) {
 
@@ -78,7 +75,6 @@ public class Chat implements Chat_itf {
 
         }
         history.add(mess);
-        System.out.println(mess);
     }
 
     public void requestHistory(Accounting_itf client) throws RemoteException {
@@ -110,7 +106,6 @@ public class Chat implements Chat_itf {
             Accounting_itf receiverW = findClient(receiver);
             receiverW.wizz();
         } else {
-            System.out.println("Error ! ");
             sender.recupMessage(receiver + " is not known !", "red");
         }
     }

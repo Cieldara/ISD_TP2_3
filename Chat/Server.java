@@ -7,7 +7,7 @@ public class Server {
     public static void main(String[] args) {
         try {
             Registry registry = LocateRegistry.getRegistry();
-            Chat_itf chat_stub = (Chat_itf) UnicastRemoteObject.exportObject(new Chat(registry), 0);
+            Chat_itf chat_stub = (Chat_itf) UnicastRemoteObject.exportObject(new Chat(), 0);
             registry.bind("ChatService", chat_stub);
 
             System.out.println("Server ready");
