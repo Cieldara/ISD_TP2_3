@@ -93,19 +93,13 @@ public class ChatClient extends Application {
             root.setLeft(online);
             root.setBottom(inputPane);
 
-            send.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent e) {
-                    sendMessage(messageField, chat, client, registry, a_stub);
-                }
+            send.setOnAction((ActionEvent e) -> {
+                sendMessage(messageField, chat, client, registry, a_stub);
             });
 
-            messageField.setOnKeyPressed(new EventHandler<KeyEvent>() {
-                @Override
-                public void handle(KeyEvent ke) {
-                    if (ke.getCode().equals(KeyCode.ENTER)) {
-                        sendMessage(messageField, chat, client, registry, a_stub);
-                    }
+            messageField.setOnKeyPressed((KeyEvent ke) -> {
+                if (ke.getCode().equals(KeyCode.ENTER)) {
+                    sendMessage(messageField, chat, client, registry, a_stub);
                 }
             });
 
@@ -118,20 +112,16 @@ public class ChatClient extends Application {
             rootConnection.setTop(new Text("We-llBehaved Chat"));
             stage.setTitle("We-llBehaved Chat");
             Scene scene = new Scene(rootConnection);
-            connectionButton.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    username = userNameField.getText();
-                    try {
-                        client.setName(username);
-                        if (chat.join(client)) {
-                            name.setText("Logged as " + username);
-                            scene.setRoot(root);
-                        }
-                    } catch (RemoteException ex) {
-                        ex.printStackTrace();
-                        Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
+            connectionButton.setOnAction((ActionEvent event) -> {
+                username = userNameField.getText();
+                try {
+                    client.setName(username);
+                    if (chat.join(client)) {
+                        name.setText("Logged as " + username);
+                        scene.setRoot(root);
                     }
+                } catch (RemoteException ex) {
+                    Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
                 }
             });
 

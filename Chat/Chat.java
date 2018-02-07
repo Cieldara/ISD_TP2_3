@@ -1,15 +1,22 @@
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.rmi.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Chat implements Chat_itf {
 
     private final ArrayList<Accounting_itf> client_list;
     private final ArrayList<String> history;
+    private PrintWriter writer;
 
-    public Chat() {
+    public Chat(ArrayList<String> history, PrintWriter b) {
         this.client_list = new ArrayList<>();
-        this.history = new ArrayList<>();
+        this.history = history;
+        this.writer = b;
     }
 
     public boolean isNotUsed(String client) throws RemoteException {
@@ -75,6 +82,8 @@ public class Chat implements Chat_itf {
 
         }
         history.add(mess);
+        writer.append(mess+"\n");
+        writer.flush();
     }
 
     public void requestHistory(Accounting_itf client) throws RemoteException {
