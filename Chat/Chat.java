@@ -1,15 +1,10 @@
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.rmi.*;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 public class Chat implements Chat_itf {
 
@@ -57,6 +52,12 @@ public class Chat implements Chat_itf {
                 client.addSomeone(client_list.get(i).getName());
             }
             client.removeSomeone(client.getName());
+            client.recupMessage("Welcome on We-llBehavedChat " + client.getName() + " !", "blue");
+            client.recupMessage("Try these commands :", "blue");
+            client.recupMessage("- /wizz <Name> to wizz someone", "blue");
+            client.recupMessage("- /whisper <Name> <Message> to whisper someone", "blue");
+            client.recupMessage("- /history to retrieve the history", "blue");
+            client.recupMessage("- /exit to leave the chat", "blue");
         } catch (Exception e) {
 
         }
@@ -79,7 +80,7 @@ public class Chat implements Chat_itf {
     public void sendMessage(Accounting_itf client, String message) throws RemoteException {
         DateFormat df = new SimpleDateFormat("HH:mm:ss");
         Date dateobj = new Date();
-        String mess = "["+df.format(dateobj)+"]"+"<" + client.getName() + "> " + message;
+        String mess = "[" + df.format(dateobj) + "]" + "<" + client.getName() + "> " + message;
         try {
             for (int i = 0; i < client_list.size(); i++) {
                 client_list.get(i).recupMessage(mess, "black");
@@ -88,7 +89,7 @@ public class Chat implements Chat_itf {
 
         }
         history.add(mess);
-        writer.append(mess+"\n");
+        writer.append(mess + "\n");
         writer.flush();
     }
 

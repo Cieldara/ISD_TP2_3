@@ -13,10 +13,24 @@ import javafx.scene.Scene;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Button;
 import javafx.event.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.text.Text;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.stage.WindowEvent;
 
 public class ChatClient extends Application {
 
@@ -68,6 +82,7 @@ public class ChatClient extends Application {
 
             VBox online = new VBox();
             online.prefWidthProperty().bind(root.widthProperty().multiply(0.25));
+            online.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(2.0))));
             TextField messageField = new TextField();
             Client client = new Client(username, displayArea, root, online, messageField);
             Accounting_itf a_stub = (Accounting_itf) UnicastRemoteObject.exportObject(client, 0);
@@ -106,9 +121,13 @@ public class ChatClient extends Application {
 
             /* Interface de connection */
             BorderPane rootConnection = new BorderPane();
+            BorderPane fieldPane = new BorderPane();
             TextField userNameField = new TextField();
+            userNameField.setPromptText("Enter your pseudonyme !");
             Button connectionButton = new Button("Connection");
-            rootConnection.setCenter(userNameField);
+            rootConnection.setCenter(fieldPane);
+            fieldPane.setCenter(new ImageView(new Image("baby.png")));
+            fieldPane.setBottom(userNameField);
             rootConnection.setBottom(connectionButton);
             rootConnection.setTop(new Text("We-llBehaved Chat"));
             stage.setTitle("We-llBehaved Chat");
@@ -120,6 +139,9 @@ public class ChatClient extends Application {
                     if (chat.join(client)) {
                         name.setText("Logged as " + username);
                         scene.setRoot(root);
+                    } else {
+                        Shaker shaker = new Shaker(userNameField);
+                        shaker.shake();
                     }
                 } catch (RemoteException ex) {
                     Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
@@ -130,26 +152,22 @@ public class ChatClient extends Application {
             stage.setWidth(500);
             stage.setHeight(500);
             stage.show();
+            rootConnection.requestFocus();
 
-            /*
-             while(!fin){
+            stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 
-             String message = scanner.nextLine();
-             if(message.equals("/exit")){
-             fin = true;
-             }
-             else if(message.equals("/history")){
-             chat.requestHistory(a_stub);
-             }
-             else{
-             chat.sendMessage(a_stub,message);
-             }
+                @Override
+                public void handle(WindowEvent event) {
+                    try {
+                        chat.leave(client);
+                    } catch (RemoteException ex) {
+                        Logger.getLogger(ChatClient.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    Platform.exit();
+                    System.exit(0);
 
-             }
-
-             chat.leave(client);
-             registry.unbind("RecupService"+getParameters().getRaw().get(1));
-             System.exit(0);*/
+                }
+            });
         } catch (Exception e) {
             System.err.println("Error on client: " + e);
         }

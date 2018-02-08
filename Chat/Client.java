@@ -9,7 +9,6 @@ import javafx.scene.text.Text;
 import javafx.scene.layout.VBox;
 import javafx.scene.Cursor;
 import javafx.scene.control.TextField;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 
@@ -66,7 +65,13 @@ public class Client implements Accounting_itf {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                Text text = new Text(message);
+                String messageTMP = message.replaceAll(":\\)","\u263A");
+                messageTMP = messageTMP.replaceAll(";\\)","\uD83D\uDE09");
+                messageTMP = messageTMP.replaceAll("\\^\\^","\uD83D\uDE0A");
+                
+                
+                //String replaceAll3 = message.replaceAll(":\\)","\u263A");
+                Text text = new Text(messageTMP);
                 Color col;
                 switch (color) {
                     case "red":
@@ -111,8 +116,9 @@ public class Client implements Accounting_itf {
 
                     @Override
                     public void handle(MouseEvent event) {
-                        messageField.setText("/whisper " + text.getText());
+                        messageField.setText("/whisper " + text.getText() + " ");
                         messageField.requestFocus();
+                        messageField.end();
                     }
                 });
                 onlinePeople.getChildren().add(text);
