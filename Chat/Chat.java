@@ -6,6 +6,10 @@ import java.rmi.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class Chat implements Chat_itf {
 
@@ -73,7 +77,9 @@ public class Chat implements Chat_itf {
     }
 
     public void sendMessage(Accounting_itf client, String message) throws RemoteException {
-        String mess = "<" + client.getName() + "> " + message;
+        DateFormat df = new SimpleDateFormat("HH:mm:ss");
+        Date dateobj = new Date();
+        String mess = "["+df.format(dateobj)+"]"+"<" + client.getName() + "> " + message;
         try {
             for (int i = 0; i < client_list.size(); i++) {
                 client_list.get(i).recupMessage(mess, "black");

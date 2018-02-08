@@ -6,19 +6,27 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.scene.layout.VBox;
+import javafx.scene.Cursor;
+import javafx.scene.control.TextField;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent;
 
 public class Client implements Accounting_itf {
 
     private String name;
     private final ListView list;
     private final Pane pane;
-    private final ListView onlinePeople;
+    private final VBox onlinePeople;
+    private final TextField messageField;
 
-    public Client(String name, ListView l, Pane p, ListView online) {
+    public Client(String name, ListView l, Pane p, VBox online, TextField m) {
         this.name = name;
         this.list = l;
         this.pane = p;
         this.onlinePeople = online;
+        this.messageField = m;
     }
 
     public void setName(String name) throws RemoteException {
@@ -96,8 +104,18 @@ public class Client implements Accounting_itf {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                onlinePeople.getItems().add(name);
+                System.out.println("Add ok");
+                Text text = new Text(name);
+                text.setCursor(Cursor.HAND);
+                text.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
+                    @Override
+                    public void handle(MouseEvent event) {
+                        messageField.setText("/whisper " + text.getText());
+                        messageField.requestFocus();
+                    }
+                });
+                onlinePeople.getChildren().add(text);
             }
         });
     }
@@ -107,7 +125,12 @@ public class Client implements Accounting_itf {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                onlinePeople.getItems().remove(name);
+                for (int i = 0; i < onlinePeople.getChildren().size(); i++) {
+                    Text t = (Text) onlinePeople.getChildren().get(i);
+                    if (t.getText().equals(name)) {
+                        onlinePeople.getChildren().remove(i);
+                    }
+                }
             }
         });
 

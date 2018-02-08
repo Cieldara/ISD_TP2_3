@@ -16,6 +16,7 @@ import javafx.event.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
+import javafx.scene.layout.VBox;
 
 public class ChatClient extends Application {
 
@@ -65,17 +66,17 @@ public class ChatClient extends Application {
             /* Interface du tchat */
             BorderPane root = new BorderPane();
 
-            ListView online = new ListView();
+            VBox online = new VBox();
             online.prefWidthProperty().bind(root.widthProperty().multiply(0.25));
-
-            Client client = new Client(username, displayArea, root, online);
+            TextField messageField = new TextField();
+            Client client = new Client(username, displayArea, root, online, messageField);
             Accounting_itf a_stub = (Accounting_itf) UnicastRemoteObject.exportObject(client, 0);
 
             Registry registry = LocateRegistry.getRegistry(host);
             Chat_itf chat = (Chat_itf) registry.lookup("ChatService");
 
             BorderPane inputPane = new BorderPane();
-            TextField messageField = new TextField();
+
             Button send = new Button("Send");
             inputPane.setCenter(messageField);
             inputPane.setRight(send);
