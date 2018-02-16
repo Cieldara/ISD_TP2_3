@@ -100,10 +100,6 @@ public class ChatClient extends Application {
             Text serverName = new Text("We-llBehaved Chat");
             infoPane.setRight(serverName);
             infoPane.setLeft(name);
-            //Image image = new Image("baby.png");
-            //infoPane.setBackground(new Background(new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT)));
-            //image.setPreserveRatio(true);
-            //infoPane.setCenter(image);
             root.setTop(infoPane);
             root.setCenter(displayArea);
             root.setLeft(online);
@@ -121,6 +117,7 @@ public class ChatClient extends Application {
 
             /* Interface de connection */
             BorderPane rootConnection = new BorderPane();
+			rootConnection.setStyle("-fx-background-color: #FFFFFF;");
             BorderPane fieldPane = new BorderPane();
             TextField userNameField = new TextField();
             userNameField.setPromptText("Enter your pseudonyme !");

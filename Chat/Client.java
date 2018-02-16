@@ -109,7 +109,6 @@ public class Client implements Accounting_itf {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                System.out.println("Add ok");
                 Text text = new Text(name);
                 text.setCursor(Cursor.HAND);
                 text.setOnMouseClicked(new EventHandler<MouseEvent>() {

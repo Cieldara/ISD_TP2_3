@@ -13,6 +13,12 @@ public class Server {
 
     public static void main(String[] args) {
         try {
+			if (args.length != 1) {
+                System.out.println("Usage: java Server <Your_IP_address>");
+                return;
+            }
+
+			String host = args[0];
             File historyFile = new File("history.txt");
             ArrayList<String> history = new ArrayList<>();
             if (!historyFile.exists()) {
@@ -28,7 +34,7 @@ public class Server {
                 }
             }
             PrintWriter writer = new PrintWriter(new FileWriter(historyFile, true));
-            Registry registry = LocateRegistry.getRegistry();
+            Registry registry = LocateRegistry.getRegistry(host);
             Chat_itf chat_stub = (Chat_itf) UnicastRemoteObject.exportObject(new Chat(history,writer), 0);
             registry.bind("ChatService", chat_stub);
 
